@@ -1,0 +1,142 @@
+.header {
+  background: #222;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  margin-bottom: 10px;
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+  }
+
+  .header_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 35px;
+    width: 100%;
+  }
+
+  .header_logo {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .header_menu {
+    flex: 1;
+    text-align: center;
+
+    ul {
+      display: flex;
+      gap: 20px;
+      position: relative;
+
+      li {
+        list-style: none;
+        position: relative;
+
+        a {
+          color: #fff;
+          text-decoration: none;
+          font-size: 16px;
+          &:hover {
+            color: #ff5722;
+          }
+        }
+
+        .dropdown {
+          display: none;
+          position: absolute;
+          background: #333;
+          min-width: 150px;
+          top: 100%;
+          left: 0;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+
+          a {
+            display: block;
+            padding: 10px;
+            color: #fff;
+            text-align: left;
+            &:hover {
+              background: #444;
+            }
+          }
+        }
+
+        &:hover .dropdown {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .header_search {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 700px;
+    margin-right: 10px;
+
+    input {
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      outline: none;
+      flex: 1;
+      
+    }
+
+    button {
+      background: #ff5722;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .header_right {
+    display: flex;
+    align-items: center;
+
+    .cart, .login {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      margin-right: 35px;
+      font-size: 16px;
+
+      span {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .menu_toggle {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header_menu {
+    display: none;
+  }
+
+  .menu_toggle {
+    display: block;
+  }
+}

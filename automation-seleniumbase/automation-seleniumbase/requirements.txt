@@ -1,0 +1,8 @@
+pandas
+requests
+seleniumbase
+python-dotenv
+schedule
+flask
+dotenv
+payos

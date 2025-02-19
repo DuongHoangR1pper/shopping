@@ -1,0 +1,35 @@
+.content {
+    padding: 20px;
+    max-width: 1170px;
+    width: 100%;
+    margin: 0 auto; /* Căn giữa bằng margin auto */
+    display: flex; /* Sử dụng Flexbox */
+    flex-direction: column; /* Sắp xếp theo chiều dọc */
+    align-items: center; /* Căn giữa theo chiều ngang */
+  }
+  
+  h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px; 
+    text-align: center;
+  }
+  
+  .row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%; /* Đảm bảo chiều rộng của hàng là 100% */
+  }
+  
+  .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s;
+    background-color: #fff;
+  
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
