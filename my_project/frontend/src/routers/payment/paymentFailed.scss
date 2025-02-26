@@ -1,0 +1,46 @@
+.payment-result {
+    height: 400px;
+    text-align: center;
+    margin-top: 50px;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 60%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  
+    h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  
+    p {
+      font-size: 18px;
+      color: #555;
+    }
+  
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.3s;
+  
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  
+    &.failed {
+        background: #fde8e8;
+        border-left: 6px solid #d9534f;
+    
+        h2 {
+          color: #d9534f;
+        }
+      }
+    }

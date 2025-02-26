@@ -9,6 +9,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./layouts/rootLayout.jsx";
 import React from "react";
 import PaymentPage from "./routers/payment/paymentPage.jsx";
+import { PaymentSuccess } from "./routers/payment/paymentSuccess.jsx";
+import { PaymentFailed } from "./routers/payment/paymentFailed.jsx";
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -28,6 +30,14 @@ const router = createBrowserRouter([
       {
         path: "/payment",
         element: <PaymentPage />
+      },
+      {
+        path: "/payment-success",
+        element: <PaymentSuccess/>
+      },
+        {
+        path: "/payment-failed",
+        element: <PaymentFailed />
       },
      
     ]

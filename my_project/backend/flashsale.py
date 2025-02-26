@@ -179,6 +179,20 @@ def create_payment_link():
         return jsonify({"error": str(e)}), 400
 
 
+@app.route("/api/check-payment-status", methods=["POST"])
+def check_payment_status():
+    try:
+        data = request.get_json()
+        order_code = data.get("orderCode")
+        
+        if not order_code:
+            return jsonify({"error": "Order code is required"}), 400
+        
+        payment_status = payos.getPaymentStatus(order_code)
+        return jsonify({"status": payment_status.status})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
 # (Optional) Debug route to list files in your uploads folder
 @app.route("/check_uploads")
 def check_uploads():
