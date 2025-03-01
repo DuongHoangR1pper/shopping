@@ -6,25 +6,25 @@ import "./homePage.scss";
 export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     axios.get("http://127.0.0.1:5000")
       .then(response => {
         const updatedProducts = response.data.map(product => {
-          let imgUrl = product.product_image_url;
-          if (!imgUrl.startsWith('http')) {
-            if (imgUrl.startsWith('C:') || imgUrl.includes('\\')) {
-              imgUrl = `http://127.0.0.1:5000/static/${imgUrl.replace(/\\/g, '/').split('static/').pop()}`;
-            } else if (imgUrl.startsWith('uploads/')) {
-              imgUrl = `http://127.0.0.1:5000/static/${imgUrl}`;
-            }
-          }
+          let imgUrl = product.product_image_url.trim();
+  
+          // Mã hóa các ký tự đặc biệt trong URL
+          imgUrl = imgUrl.replace(/\(/g, "%28").replace(/\)/g, "%29");
+  
           return { ...product, product_image_url: imgUrl };
         });
+  
         setProducts(updatedProducts);
       })
       .catch(() => setError("Failed to load products"));
   }, []);
+  
+  
+  
 
   return (
     <div className="content">

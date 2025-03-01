@@ -1,63 +1,87 @@
+import pandas as pd
 import os
-import csv
-import uuid
-from flask import Flask, render_template, request, redirect, url_for, flash
-from werkzeug.utils import secure_filename
+import time
+from flask_cors import CORS
+from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template, request, redirect, url_for
+from payos import PayOS, ItemData, PaymentData
 
+load_dotenv()
+BASE_ANALYSIS_DIR = os.getenv(r'BASE_ANALYSIS_DIR')
+PAYOS_CLIENT_ID = os.getenv("PAYOS_CLIENT_ID")
+PAYOS_API_KEY = os.getenv("PAYOS_API_KEY")
+PAYOS_CHECKSUM_KEY = os.getenv("PAYOS_CHECKSUM_KEY")
+PAYOS_PARTNER_CODE = os.getenv("PAYOS_PARTNER_CODE")
+WEB_DOMAIN = os.getenv("WEB_DOMAIN")
+
+payos = PayOS(PAYOS_CLIENT_ID, PAYOS_API_KEY, PAYOS_CHECKSUM_KEY, PAYOS_PARTNER_CODE)
+BASE_PROJECT_DIR = os.getenv("BASE_PROJECT_DIR")
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = r'C:\Users\Cuong Do\Desktop\agritech\my_project\static\uploads'
-app.config['CSV_FILE'] = r'C:\Users\Cuong Do\Desktop\agritech\my_project\data\analysis.csv'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Ensure the upload directory exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-@app.route('/')
-def index():
-    return render_template('add_product.html')
+# @app.route("/")
+# def display_products():
+#     products = []
+#     try:
+#         data = pd.read_csv(os.path.join(BASE_ANALYSIS_DIR, 'analysis.csv'))
 
-@app.route('/add_product', methods=['POST'])
-def add_product():
-    category = request.form['category']
-    product_name = request.form['product_name']
-    discount_percentage = request.form['discount_percentage']
-    current_price = request.form['current_price']
-    original_price = request.form['original_price']
-    
-    # Handle file upload
-    if 'product_image' not in request.files:
-        flash('No file part', 'error')
-        return redirect(request.url)
-    
-    file = request.files['product_image']
-    if file.filename == '':
-        flash('No selected file', 'error')
-        return redirect(request.url)
+#         if not {'product_name', 'discount_percentage', 'current_price', 'original_price', 'product_image_url'}.issubset(data.columns):
+#             return "The CSV file must contain 'product_name', 'discount_percentage', 'current_price', 'original_price', 'product_image_url', and columns.", 400
 
-    if file:
-        # Get the file extension (default to jpg if none)
-        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
-        # Generate a unique file name using the product name and a short UUID
-        unique_filename = f"{product_name.replace(' ', '_')}_{uuid.uuid4().hex[:8]}.{file_ext}"
-        secure_file = secure_filename(unique_filename)
-        
-        # Save the file to the UPLOAD_FOLDER
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_file)
-        file.save(file_path)
-        
-        # Create a relative path with forward slashes.
-        # (Using an f-string here ensures the CSV will store: uploads/filename.jpg)
-        image_path = f"uploads/{secure_file}"
-    else:
-        image_path = ""
-    
-    # Append new product data to CSV
-    with open(app.config['CSV_FILE'], 'a', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([category, product_name, discount_percentage, current_price, original_price, image_path])
+#         products = data.to_dict(orient="records")
+#     except Exception as e:
+#         return f"An error occurred while processing the file: {e}", 500
 
-    flash('Sản phẩm đã được thêm thành công!', 'success')
-    return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    app.secret_key = 'your_secret_key'  # Configure your secret key here (see previous instructions)
-    app.run(debug=True, port=1989)
+#     return render_template("index.html", products=products)
+
+
+@app.route("/", methods=["GET"])
+def display_products():
+    products = []
+    try:
+        data = pd.read_csv(os.path.join(BASE_ANALYSIS_DIR, "analysis.csv"))
+        required_columns = {
+            "product_name",
+            "discount_percentage",
+            "current_price",
+            "original_price",
+            "product_image_url",
+        }
+        if not required_columns.issubset(data.columns):
+            return (
+                "The CSV file must contain 'product_name', 'discount_percentage', 'current_price', "
+                "'original_price', 'product_image_url' and columns."
+            ), 400
+        products = data.to_dict(orient="records")
+        return jsonify(products), 200
+    except Exception as e:
+        return f"An error occurred while processing the file: {e}", 500
+
+
+@app.route("/payment", methods=["POST"])
+def create_payment_link():
+    try:
+        product_name = request.form.get("product_name")
+        current_price = int(float(request.form.get("current_price")))
+        item = ItemData(name=product_name, quantity=1, price=current_price)
+        payment_data = PaymentData(
+            orderCode=int(time.time()),
+            amount=current_price,
+            description="Thanh toan don hang",
+            items=[item],
+            cancelUrl=WEB_DOMAIN,
+            returnUrl=WEB_DOMAIN
+            # cancelUrl=WEB_DOMAIN + "/cancel.html",
+            # returnUrl=WEB_DOMAIN + "/payment_status"
+        )
+        payment_link_response = payos.createPaymentLink(payment_data)
+    except Exception as e:
+        return str(e)
+
+    return redirect(payment_link_response.checkoutUrl)
+
+if __name__ == "__main__":
+    app.run(debug=True)
